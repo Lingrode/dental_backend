@@ -8,4 +8,4 @@
 - MongoDB / Mongoose
 - Expo
 
-#### Server side of the application is here
+#### Client side of the application is [here](https://github.com/Lingrode/dental_mobile)
