@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 const { Schema } = mongoose;
 
 const AppointmentSchema = new Schema(
@@ -8,13 +8,13 @@ const AppointmentSchema = new Schema(
     diagnosis: String,
     date: String,
     time: String,
-    patient: { type: Schema.Types.ObjectId, ref: 'Patient' },
+    patient: { type: Schema.Types.ObjectId, ref: "Patient" },
   },
   {
-    timestamps: true
-  })
+    timestamps: true,
+  }
+);
 
-const Appointment = mongoose.model('Appointment', AppointmentSchema);
+const Appointment = mongoose.model("Appointment", AppointmentSchema);
 
 module.exports = Appointment;
-

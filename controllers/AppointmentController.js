@@ -1,20 +1,20 @@
-const { validationResult } = require('express-validator');
+const { validationResult } = require("express-validator");
 
-const dayjs = require('dayjs');
-const uaLocale = require('dayjs/locale/uk');
-const utc = require('dayjs/plugin/utc');
-const timezone = require('dayjs/plugin/timezone');
+const dayjs = require("dayjs");
+const uaLocale = require("dayjs/locale/uk");
+const utc = require("dayjs/plugin/utc");
+const timezone = require("dayjs/plugin/timezone");
 
-const { groupBy, reduce } = require('lodash')
+const { groupBy, reduce } = require("lodash");
 
-const { Appointment, Patient } = require('../models');
+const { Appointment, Patient } = require("../models");
 
-const { sendSMS } = require('../utils');
+const { sendSMS } = require("../utils");
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
 
-function AppointmentController() { }
+function AppointmentController() {}
 
 const create = async (req, res) => {
   const errors = validationResult(req);
@@ -23,7 +23,7 @@ const create = async (req, res) => {
   if (!errors.isEmpty()) {
     return res.status(422).json({
       success: false,
-      data: errors.array()
+      data: errors.array(),
     });
   }
 
@@ -42,14 +42,14 @@ const create = async (req, res) => {
     if (!patient) {
       return res.status(404).json({
         success: false,
-        message: 'PATIENT_NOT_FOUND'
-      })
+        message: "PATIENT_NOT_FOUND",
+      });
     }
 
     const doc = await Appointment.create(data);
     res.status(201).json({
       success: true,
-      data: doc
+      data: doc,
     });
 
     // const delayedTime = dayjs(
@@ -68,11 +68,10 @@ const create = async (req, res) => {
     // }).then(({ data }) => {
     //   console.log(data);
     // });
-
   } catch (err) {
     res.status(500).json({
       success: false,
-      message: err.message
+      message: err.message,
     });
   }
 };
@@ -84,7 +83,7 @@ const update = async (req, res) => {
   if (!errors.isEmpty()) {
     return res.status(422).json({
       success: false,
-      message: errors.array()
+      message: errors.array(),
     });
   }
 
@@ -107,25 +106,24 @@ const update = async (req, res) => {
     // }
 
     const doc = await Appointment.updateOne(
-      { _id: appointmentId, },
-      { $set: data },
+      { _id: appointmentId },
+      { $set: data }
     );
 
     if (!doc) {
       return res.status(404).json({
         success: false,
-        message: 'APPOINTMENT_NOT_FOUND'
-      })
+        message: "APPOINTMENT_NOT_FOUND",
+      });
     }
 
     res.json({
       success: true,
     });
-
   } catch (err) {
     res.status(500).json({
       success: false,
-      message: err.message
+      message: err.message,
     });
   }
 };
@@ -139,44 +137,60 @@ const remove = async (req, res) => {
     if (!patient) {
       return res.status(404).json({
         success: false,
-        message: 'APPOINTMENT_NOT_FOUND'
-      })
+        message: "APPOINTMENT_NOT_FOUND",
+      });
     }
 
     await Appointment.deleteOne({ _id: id });
     res.json({
-      status: 'success',
+      status: "success",
     });
   } catch (err) {
     return res.status(500).json({
       success: false,
-      message: err.message
+      message: err.message,
     });
   }
 };
 
 const all = async function (req, res) {
   Appointment.find({})
-    .populate('patient').exec().then(docs => {
-
-      docs = docs.filter(doc => {
-        const appointmentDateTime = dayjs(doc.date + ' ' + doc.time, 'YYYY-MM-DD HH:mm').add(30, 'minute').tz('Europe/Kiev');
-        return appointmentDateTime.isAfter(dayjs().tz('Europe/Kiev'));
+    .populate("patient")
+    .exec()
+    .then((docs) => {
+      docs = docs.filter((doc) => {
+        const appointmentDateTime = dayjs(
+          doc.date + " " + doc.time,
+          "YYYY-MM-DD HH:mm"
+        )
+          .add(30, "minute")
+          .tz("Europe/Kiev");
+        return appointmentDateTime.isAfter(dayjs().tz("Europe/Kiev"));
       });
 
       res.json({
-        status: 'success',
+        status: "success",
         data: reduce(
-          groupBy(docs, 'date'),
+          groupBy(docs, "date"),
           (result, value, key) => {
-            result = [...result, { title: dayjs(key).locale(uaLocale).format('D MMMM'), originalDate: key, data: value }];
+            result = [
+              ...result,
+              {
+                title: dayjs(key).locale(uaLocale).format("D MMMM"),
+                originalDate: key,
+                data: value,
+              },
+            ];
             return result;
-          }, []),
+          },
+          []
+        ),
       });
-    }).catch(err => {
+    })
+    .catch((err) => {
       return res.status(500).json({
         success: false,
-        message: err
+        message: err,
       });
     });
 };
@@ -189,4 +203,3 @@ AppointmentController.prototype = {
 };
 
 module.exports = AppointmentController;
-

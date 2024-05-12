@@ -1,3 +1,3 @@
 module.exports = {
-  sendSMS: require('./sendSMS')
-}
+  sendSMS: require("./sendSMS"),
+};

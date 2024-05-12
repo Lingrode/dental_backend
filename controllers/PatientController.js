@@ -1,14 +1,14 @@
-const { validationResult } = require('express-validator');
-const { Patient } = require('../models');
+const { validationResult } = require("express-validator");
+const { Patient } = require("../models");
 
-function PatientController() { }
+function PatientController() {}
 
 const create = async (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     return res.status(422).json({
       success: false,
-      data: errors.array()
+      data: errors.array(),
     });
   }
 
@@ -20,12 +20,12 @@ const create = async (req, res) => {
     const doc = await Patient.create(data);
     res.status(201).json({
       success: true,
-      data: doc
+      data: doc,
     });
   } catch (err) {
     res.status(500).json({
       success: false,
-      message: err.message
+      message: err.message,
     });
   }
 };
@@ -37,7 +37,7 @@ const update = async (req, res) => {
   if (!errors.isEmpty()) {
     return res.status(422).json({
       success: false,
-      message: errors.array()
+      message: errors.array(),
     });
   }
 
@@ -47,26 +47,22 @@ const update = async (req, res) => {
       phone: req.body.phone,
     };
 
-    const doc = await Patient.updateOne(
-      { _id: patientId, },
-      { $set: data },
-    );
+    const doc = await Patient.updateOne({ _id: patientId }, { $set: data });
 
     if (!doc) {
       return res.status(404).json({
         success: false,
-        message: 'PATIENT_NOT_FOUND'
-      })
+        message: "PATIENT_NOT_FOUND",
+      });
     }
 
     res.json({
-      success: true
+      success: true,
     });
-
   } catch (err) {
     res.status(500).json({
       success: false,
-      message: err.message
+      message: err.message,
     });
   }
 };
@@ -80,54 +76,56 @@ const remove = async (req, res) => {
     if (!patient) {
       return res.status(404).json({
         success: false,
-        message: 'PATIENT_NOT_FOUND'
-      })
+        message: "PATIENT_NOT_FOUND",
+      });
     }
 
     await Patient.deleteOne({ _id: id });
     res.json({
-      status: 'success',
+      status: "success",
     });
   } catch (err) {
     return res.status(500).json({
       success: false,
-      message: err.message
+      message: err.message,
     });
   }
 };
 
 const all = async (req, res) => {
-  Patient.find({}).then(docs => {
-    res.json({
-      status: 'success',
-      data: docs
+  Patient.find({})
+    .then((docs) => {
+      res.json({
+        status: "success",
+        data: docs,
+      });
+    })
+    .catch((err) => {
+      return res.status(500).json({
+        success: false,
+        message: err,
+      });
     });
-  }).catch(err => {
-    return res.status(500).json({
-      success: false,
-      message: err
-    });
-  });
 };
 
 const show = async (req, res) => {
   const id = req.params.id;
   try {
-    const patient = await Patient.findById(id).populate('appointments').exec();
+    const patient = await Patient.findById(id).populate("appointments").exec();
     if (!patient) {
       return res.status(404).json({
         success: false,
-        message: 'PATIENT_NOT_FOUND'
+        message: "PATIENT_NOT_FOUND",
       });
     }
     res.json({
-      status: 'success',
-      data: { ...patient._doc, appointments: patient.appointments }
+      status: "success",
+      data: { ...patient._doc, appointments: patient.appointments },
     });
   } catch (e) {
     return res.status(500).json({
       success: false,
-      message: e.message
+      message: e.message,
     });
   }
 };
@@ -137,8 +135,7 @@ PatientController.prototype = {
   update,
   remove,
   all,
-  show
+  show,
 };
 
 module.exports = PatientController;
-
