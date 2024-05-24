@@ -17,4 +17,4 @@
 - querystring
 - nodemon
 
-#### Client side of the application is [here](https://github.com/Lingrode/dental_mobile)
+#### Client side of the application is [here](https://github.com/Lingrode/diplomaProjectClient)
